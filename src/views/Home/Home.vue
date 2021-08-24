@@ -12,82 +12,95 @@
       </el-header>
 
       <el-container>
-        <el-aside width="200px">
+        <el-aside :width="isToggleCollapse?'64px':'200px'">
+          <div class="toggleButton" @click="toggleCollapse">|||</div>
           <el-menu
             :uniqueOpened="true"
-            default-active="2"
+            :default-active="activePage"
             class="el-menu-vertical-demo"
             @open="handleOpen"
             @close="handleClose"
-            background-color="#545c64"
+            background-color="#333744"
             text-color="#fff"
-            active-text-color="#ffd04b">
-            <el-submenu index="1">
+            active-text-color="#409BFF"
+            :collapse='isToggleCollapse'
+            :collapse-transition='false'
+            :router='true'
+            
+            >
+            <el-submenu :index="item.id+''" v-for="item in leftMenuData" :key="item">
               <template #title>
-                <i class="el-icon-location"></i>
-                <span>导航一</span>
+                <i :class="iconList[item.id]"></i>
+                <span>{{item.authName}}</span>
               </template>
-              <el-menu-item-group>
-                <template #title>分组一</template>
-                <el-menu-item index="1-1">选项1</el-menu-item>
-                <el-menu-item index="1-2">选项2</el-menu-item>
-              </el-menu-item-group>
-              <el-menu-item-group title="分组2">
-                <el-menu-item index="1-3">选项3</el-menu-item>
-              </el-menu-item-group>
-              <el-submenu index="1-4">
-                <template #title>选项4</template>
-                <el-menu-item index="1-4-1">选项1</el-menu-item>
-              </el-submenu>
+              <el-menu-item :index="'/'+i.path" v-for="i in item.children" :key="i" @click="saveActivePage(i.path)">
+                <i class="el-icon-menu"></i>
+                <span>{{i.authName}}</span>
+                
+              </el-menu-item>
+              
             </el-submenu>
-            <el-menu-item index="2">
-              <i class="el-icon-menu"></i>
-              <template #title>导航二</template>
-            </el-menu-item>
-            <el-menu-item index="3" disabled>
-              <i class="el-icon-document"></i>
-              <template #title>导航三</template>
-            </el-menu-item>
-            <el-menu-item index="4">
-              <i class="el-icon-setting"></i>
-              <template #title>导航四</template>
-            </el-menu-item>
-            <el-submenu index="5">
-              <template #title>
-                <i class="el-icon-location"></i>
-                <span>导航一</span>
-              </template>
-              <el-menu-item-group>
-                <template #title>分组一</template>
-                <el-menu-item index="5-1">选项1</el-menu-item>
-                <el-menu-item index="5-2">选项2</el-menu-item>
-              </el-menu-item-group>
-              <el-menu-item-group title="分组2">
-                <el-menu-item index="5-3">选项3</el-menu-item>
-              </el-menu-item-group>
-            </el-submenu>
+            
           </el-menu>
         </el-aside>
-        <el-main>Main</el-main>
+        <el-main>
+          <router-view>
+            
+          </router-view>
+        </el-main>
       </el-container>
     </el-container>
   </div>
 </template>
 
 <script>
+import {request} from '../../network/request.js'
+
+
+
 export default {
   el: '',
   data () {
     return {
-      
+      leftMenuData:'',
+      iconList:{
+        125:'el-icon-user-solid',
+        103:'el-icon-s-promotion',
+        101:'el-icon-s-shop',
+        102:'el-icon-s-order',
+        145:'el-icon-s-platform'
+      },
+      isToggleCollapse:true,
+      activePage:''
     }
   },
   methods: {
     exit(){
+      
       window.sessionStorage.clear()
       this.$router.push('/login')
+    },
+    getLeftMenu(){
+      request().get('/menus').then(res=>{
+        if(res.data.meta.status !=200){return this.$message.error(res.data.meta.msg)}
+        this.leftMenuData = res.data.data
+        console.log(res);
+      })
+    },
+    toggleCollapse(){
+      this.isToggleCollapse = !this.isToggleCollapse
+    },
+    saveActivePage(path){
+      this.activePage = path
     }
   },
+  components:{
+    
+    
+  },
+  created(){
+    this.getLeftMenu()
+  }
 }
 </script>
 
@@ -117,8 +130,21 @@ export default {
   }
   .el-aside{
     background: #333744;
+    
+  }
+  .el-aside .el-menu{
+    border-right: none;
   }
   .el-main{
     background: #eaedf1;
+  }
+  .toggleButton{
+    background: #4A5064;
+    color: white;
+    font-size: 10px;
+    line-height: 24px;
+    text-align: center;
+    cursor: pointer;
+    letter-spacing: 0.2rem;
   }
 </style>

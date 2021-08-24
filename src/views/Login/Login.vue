@@ -75,17 +75,13 @@ export default {
     preLogin(){                  
       this.$refs.loginForm.validate(valid=>{
         if(!valid) return valid  //登录预验证
-        request({
-          
-          url:'/login',
-          params:this.loginForm
-          
-        }).then(res=>{
+        request().post('/login',this.loginForm).then(res=>{
           
           if(res.data.meta.status!=200){return this.$message.error('error')}
           
           this.$message.success('success')
           console.log(res);
+          
           window.sessionStorage.setItem('token',res.data.data.token)
           this.$router.push('/home')
         })
