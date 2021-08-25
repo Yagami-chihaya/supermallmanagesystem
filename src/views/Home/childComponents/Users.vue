@@ -10,18 +10,18 @@
       <el-card class="box-card">
         <el-row :gutter="30">
           <el-col :span="8">
-            <el-input placeholder="请输入内容">
+            <el-input placeholder="请输入内容" v-model="this.$store.state.queryInfo.query" clearable @clear="getUserData">
               <template #append>
-                <el-button icon="el-icon-search"></el-button>
+                <el-button icon="el-icon-search" @click="getUserData"></el-button>
               </template>
             </el-input> 
           </el-col>
           <el-col :span="4">
-            <el-button type="primary">添加用户</el-button>
+            <el-button type="primary" @click='$store.state.isAddDialogVisible = true'>添加用户</el-button>
           </el-col>
         </el-row>
 
-        <el-table :data='userData' border stripe>
+        <el-table :data='$store.state.userData' border stripe>
           <el-table-column type="index"></el-table-column>
           <el-table-column label="姓名" prop="username" width="200px"></el-table-column>
           <el-table-column label="邮箱" prop="email"></el-table-column>
@@ -34,71 +34,94 @@
             </template>
           </el-table-column>
           <el-table-column label="操作" width="250px">
-            <el-button type="primary" icon="el-icon-edit"></el-button>
-            <el-button type="danger" icon="el-icon-delete"></el-button>
-            <el-button type="warning" icon="el-icon-setting"></el-button>
+            <template v-slot:='scope'>
+              <el-button type="primary" icon="el-icon-edit" @click='showEditUserBox(scope.row.id)'></el-button>
+              <el-button type="danger" icon="el-icon-delete"></el-button>
+              <el-button type="warning" icon="el-icon-setting"></el-button>
+            </template>
+            
           </el-table-column>
         </el-table>
 
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
-          :current-page="queryInfo.pagenum"
+          :current-page="this.$store.state.queryInfo.pagenum"
           :page-sizes="[1, 2, 5, 10]"
-          :page-size="queryInfo.pagesize"
+          :page-size="this.$store.state.queryInfo.pagesize"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="total">
+          :total="this.$store.state.total">
         </el-pagination>
       </el-card>
 
-      
-    
+    <add-user-box></add-user-box>
+    <edit-user-box :editUserData="editUserData"></edit-user-box>
+
+
   </div>
 </template>
 
 <script>
-
 import {request} from '../../../network/request'
+import addUserBox from '../../../components/content/addUserBox.vue'
 
+import editUserBox from '../../../components/content/EditUserBox.vue'
 
 export default {
   el: '',
-  data () {
-    return {
-      queryInfo:{
-        query:'',
-        pagenum:1,
-        pagesize:2,
-      },
-      userData:'',
-      total:0,
+  
+  data(){
+    return{
+      
+      
+      editUserData:''
     }
   },
   methods: {
-    getUserData(){
-      request().get('users',{params:this.queryInfo}).then(res=>{
+    
+    getUserData(){                
+      request().get('users',{params:this.$store.state.queryInfo}).then(res=>{
         if(res.data.meta.status!=200){return res.data.meta.msg}
         console.log(res);
-        this.userData = res.data.data.users;
-        console.log(this.userData);
-        this.total = res.data.data.total
+        this.$store.state.userData = res.data.data.users;
+        console.log(this.$store.state.userData);
+        this.$store.state.total = res.data.data.total
       })
+    
     },
+    
     handleSizeChange(newSize){
-      this.queryInfo.pagesize = newSize
+      this.$store.state.queryInfo.pagesize = newSize
+      this.getUserData()
     },
     handleCurrentChange(newPage){
-      this.queryInfo.pagenum = newPage
+      this.$store.state.queryInfo.pagenum = newPage
+      this.getUserData()
     },
     switchToggle(userinfo){
       console.log(userinfo);
       request().put(`users/${userinfo.id}/state/${userinfo.mg_state}`).then(res=>{console.log(res);})
+      
+    },
+    showEditUserBox(id){
+      this.$store.state.isEditDiglogVisible = true
+      request().get('users/'+id).then(res=>{
+        if(res.data.meta.status!=200){
+          return this.$message.error = res.data.meta.msg
+        }
+        this.editUserData = res.data.data
+        console.log(res);
+      })
       
     }
     
   },
   created(){
     this.getUserData()
+  },
+  components:{
+    addUserBox,
+    editUserBox,
   }
 }
 </script>
@@ -106,5 +129,8 @@ export default {
 <style scoped>
   .el-pagination{
     margin-top: 15px;
+  }
+  .el-input{
+    padding-bottom: 15px;
   }
 </style>

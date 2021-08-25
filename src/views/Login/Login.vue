@@ -27,7 +27,7 @@
 
 <script>
 import {Edit} from '@element-plus/icons'
-import {request} from '../../network/request.js'
+
 
 
 export default {
