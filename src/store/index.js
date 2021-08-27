@@ -5,6 +5,7 @@ export default createStore({
     
     isAddDialogVisible:false,
     isEditDiglogVisible:false,
+    isEditRightsBoxVisible:false,
     userData:'',
     total:0,
     queryInfo:{

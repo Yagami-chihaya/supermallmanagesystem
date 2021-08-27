@@ -26,6 +26,14 @@ const routes = [
         path:'/users',
         component:() =>import('../views/Home/childComponents/Users.vue')
       },
+      {
+        path:'/rights',
+        component:() =>import('../views/Home/childComponents/Rights.vue')
+      },
+      {
+        path:'/roles',
+        component:() =>import('../views/Home/childComponents/Roles.vue')
+      }
     ],
     redirect:'/welcome'
   },

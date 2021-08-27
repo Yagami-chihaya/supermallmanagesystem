@@ -36,7 +36,7 @@
           <el-table-column label="操作" width="250px">
             <template v-slot:='scope'>
               <el-button type="primary" icon="el-icon-edit" @click='showEditUserBox(scope.row.id)'></el-button>
-              <el-button type="danger" icon="el-icon-delete"></el-button>
+              <el-button type="danger" icon="el-icon-delete" @click="deleteUserData(scope.row.id)"></el-button>
               <el-button type="warning" icon="el-icon-setting"></el-button>
             </template>
             
@@ -113,6 +113,30 @@ export default {
         console.log(res);
       })
       
+    },
+    deleteUserData(id) {
+        this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          request().delete('users/'+id).then(res=>{
+            if(res.data.meta.status!=200){
+              return this.$message.error('删除失败')
+            }
+            this.getUserData()
+          })
+
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });
+        });
     }
     
   },

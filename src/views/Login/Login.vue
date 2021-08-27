@@ -27,7 +27,7 @@
 
 <script>
 import {Edit} from '@element-plus/icons'
-
+import {request} from '../../network/request'
 
 
 export default {
@@ -73,6 +73,7 @@ export default {
       this.$refs.loginForm.resetFields()
     },
     preLogin(){                  
+      console.log('123');
       this.$refs.loginForm.validate(valid=>{
         if(!valid) return valid  //登录预验证
         request().post('/login',this.loginForm).then(res=>{
