@@ -4,10 +4,11 @@
       title="分配权限"
       v-model="$store.state.isEditRightsBoxVisible"
       width="50%"
-      @close="clearDefKeys"
+      
       >
+      
       <el-tree :data="editRightsData" :props="treeProps" show-checkbox node-key='id'
-       default-expand-all :default-checked-keys="defKeys"
+       default-expand-all :default-checked-keys="defKeys" ref="treeRef"
        >
       
       
@@ -16,7 +17,7 @@
       <template #footer>
         <span class="dialog-footer" >
           <el-button @click="$store.state.isEditRightsBoxVisible = false">取 消</el-button>
-          <el-button type="primary" @click="$store.state.isEditRightsBoxVisible = false">确 定</el-button>
+          <el-button type="primary" @click="summit">确 定</el-button>
         </span>
       </template>
     </el-dialog>
@@ -35,19 +36,14 @@ export default {
         label:'authName',
         children:'children'
       },
+      
       defKeys:[],
+      key:'',
+      roleId:'',
     }
   },
-  props:{
-    defKey:'',
-  },
-  watch:{
-    defKey:function(newData){
-      
-      this.getThreeId(newData,this.defKeys)
-      
-    }
-  },
+  
+ 
   methods: {
     getEditRightsData(){
       request().get('rights/tree').then(res=>{
@@ -73,18 +69,47 @@ export default {
       
     },
     clearDefKeys(){
-      console.log(this.defKeys);
-      this.defKeys = []
+
+        this.defKeys = []
+
+    },
+    summit(){
+      const keys = [
+        ...this.$refs.treeRef.getCheckedKeys(),       //获取选中和半选中的元素id
+        ...this.$refs.treeRef.getHalfCheckedKeys()
+      ]
       
+      
+      const idStr = keys.join(',')
+      console.log(idStr);
+      request().post(`roles/${this.roleId}/rights`,{rids:idStr}).then(res=>{
+        
+        if(res.data.meta.status!=200){
+          return this.$message.error(res.data.meta.msg)
+
+        }
+        
+        this.$message.success(res.data.meta.msg)
+        
+        this.defKeys = keys
+        this.$parent.getRolesList()
+      })
+      this.$store.state.isEditRightsBoxVisible = false
     }
     
   },
   updated(){
     
     
+    this.key = this.$store.state.defKey
+    this.roleId = this.$store.state.defKey.id
+
+
+    this.clearDefKeys()
     this.getEditRightsData()
-    
-    
+    this.getThreeId(this.key,this.defKeys)
+    console.log(this.defKeys);
+      
   },
   
 }

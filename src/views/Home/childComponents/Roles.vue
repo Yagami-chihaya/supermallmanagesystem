@@ -9,7 +9,7 @@
     <el-card>
       <el-row>
         <el-col>
-          <el-button type="primary" style="marginBottom:15px">添加角色</el-button>
+          <el-button type="primary" style="marginBottom:15px"  @click="showAddRolesBox">添加角色</el-button>
         </el-col>
       </el-row>
 
@@ -56,8 +56,8 @@
           width="360px"
           label="操作">
           <template v-slot:='scope'>
-            <el-button  type="primary" icon="el-icon-edit">编辑</el-button>
-            <el-button  type="danger" icon="el-icon-delete">删除</el-button>
+            <el-button  type="primary" icon="el-icon-edit" @click="showEditRolesBox">编辑</el-button>
+            <el-button  type="danger" icon="el-icon-delete" >删除</el-button>
             <el-button  type="warning" icon="el-icon-setting" @click="showEditRightsBox(scope.row)">分配权限</el-button>
           </template>
           
@@ -66,7 +66,9 @@
 
     </el-card>
     
-      <edit-rights-box :defKey="defKey"></edit-rights-box>
+      <edit-rights-box></edit-rights-box>
+      <add-roles-box></add-roles-box>
+      <exit-roles-box></exit-roles-box>
     
     
   </div>
@@ -76,12 +78,16 @@
 import {request} from '../../../network/request'
 import editRightsBox from '../../../components/content/EditRightsBox.vue'
 
+import exitRolesBox from '../../../components/content/EditRolesBox.vue'
+import addRolesBox from '../../../components/content/AddRolesBox.vue'
+
+
 export default {
   el: '',
   data () {
     return {
       rolesList:[],
-      defKey:{default:''},
+      
     }
   },
   methods: {
@@ -116,15 +122,25 @@ export default {
     showEditRightsBox(data){
       
       this.$store.state.isEditRightsBoxVisible = true
-      this.defKey = data
+      this.$store.state.defKey = data
+      
       console.log(data);
+    },
+    showAddRolesBox(){
+      this.$store.state.isAddRolesBoxDialogVisible = true
+      
+    },
+    showEditRolesBox(){
+      this.$store.state.isEditRolesBoxDialogVisible = true
     }
   },
   created(){
     this.getRolesList()
   },
   components:{
-    editRightsBox
+    editRightsBox,
+    addRolesBox,
+    exitRolesBox,
   }
 }
 </script>

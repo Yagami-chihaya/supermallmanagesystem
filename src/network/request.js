@@ -9,11 +9,11 @@ export function request(config){
   })
   instance.interceptors.request.use(config=>{                   
     config.headers.Authorization = window.sessionStorage.getItem('token')          //将浏览器保存的token传给请求头
-    console.log('config');
-    console.log(config);
+    
+    
     return config;
   },err=>{console.log(err);})
-  console.log(instance(config));
+
   return instance
   
 }

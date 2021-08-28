@@ -6,6 +6,9 @@ export default createStore({
     isAddDialogVisible:false,
     isEditDiglogVisible:false,
     isEditRightsBoxVisible:false,
+    isSetRolesDialogVisible:false,
+    isAddRolesBoxDialogVisible:false,
+    isEditRolesBoxDialogVisible:false,
     userData:'',
     total:0,
     queryInfo:{
@@ -13,6 +16,7 @@ export default createStore({
       pagenum:1,
       pagesize:5,
     },
+    defKey:'',
   },
   mutations: {
     

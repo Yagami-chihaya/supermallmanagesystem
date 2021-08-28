@@ -37,7 +37,7 @@
             <template v-slot:='scope'>
               <el-button type="primary" icon="el-icon-edit" @click='showEditUserBox(scope.row.id)'></el-button>
               <el-button type="danger" icon="el-icon-delete" @click="deleteUserData(scope.row.id)"></el-button>
-              <el-button type="warning" icon="el-icon-setting"></el-button>
+              <el-button type="warning" icon="el-icon-setting" @click="setRoles(scope.row)"></el-button>
             </template>
             
           </el-table-column>
@@ -56,7 +56,7 @@
 
     <add-user-box></add-user-box>
     <edit-user-box :editUserData="editUserData"></edit-user-box>
-
+    <set-roles-box :UserData="UserData"></set-roles-box>
 
   </div>
 </template>
@@ -64,7 +64,7 @@
 <script>
 import {request} from '../../../network/request'
 import addUserBox from '../../../components/content/addUserBox.vue'
-
+import setRolesBox from '../../../components/content/SetRolesBox.vue'
 import editUserBox from '../../../components/content/EditUserBox.vue'
 
 export default {
@@ -72,9 +72,9 @@ export default {
   
   data(){
     return{
-      
-      
-      editUserData:''
+      editUserData:'',
+      UserData:'',
+
     }
   },
   methods: {
@@ -137,6 +137,10 @@ export default {
             message: '已取消删除'
           });
         });
+    },
+    setRoles(data){
+      this.$store.state.isSetRolesDialogVisible = true
+      this.UserData = data
     }
     
   },
@@ -146,6 +150,7 @@ export default {
   components:{
     addUserBox,
     editUserBox,
+    setRolesBox,
   }
 }
 </script>
