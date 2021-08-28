@@ -56,8 +56,8 @@
           width="360px"
           label="操作">
           <template v-slot:='scope'>
-            <el-button  type="primary" icon="el-icon-edit" @click="showEditRolesBox">编辑</el-button>
-            <el-button  type="danger" icon="el-icon-delete" >删除</el-button>
+            <el-button  type="primary" icon="el-icon-edit" @click="showEditRolesBox(scope.row)">编辑</el-button>
+            <el-button  type="danger" icon="el-icon-delete" @click="deleteRole(scope.row.id)">删除</el-button>
             <el-button  type="warning" icon="el-icon-setting" @click="showEditRightsBox(scope.row)">分配权限</el-button>
           </template>
           
@@ -68,7 +68,7 @@
     
       <edit-rights-box></edit-rights-box>
       <add-roles-box></add-roles-box>
-      <exit-roles-box></exit-roles-box>
+      <exit-roles-box :roleInfo="roleInfo"></exit-roles-box>
     
     
   </div>
@@ -79,7 +79,7 @@ import {request} from '../../../network/request'
 import editRightsBox from '../../../components/content/EditRightsBox.vue'
 
 import exitRolesBox from '../../../components/content/EditRolesBox.vue'
-import addRolesBox from '../../../components/content/AddRolesBox.vue'
+import addRolesBox from '../../../components/content/AddRoles.vue'
 
 
 export default {
@@ -87,7 +87,7 @@ export default {
   data () {
     return {
       rolesList:[],
-      
+      roleInfo:[],
     }
   },
   methods: {
@@ -130,8 +130,18 @@ export default {
       this.$store.state.isAddRolesBoxDialogVisible = true
       
     },
-    showEditRolesBox(){
+    showEditRolesBox(data){
+      this.roleInfo = data
       this.$store.state.isEditRolesBoxDialogVisible = true
+    },
+    deleteRole(id){
+      request().delete('roles/'+id).then(res=>{
+        if(res.data.meta.status!=200){
+          return this.$message.error(res.data.meta.msg)
+        }
+        this.$message.success(res.data.meta.msg)
+        this.getRolesList()
+      })
     }
   },
   created(){
