@@ -5,7 +5,7 @@
       v-model="$store.state.isEditRolesBoxDialogVisible"
       width="50%"
       >
-      <p>{{roleInfo}}</p>
+      
       <el-form ref="roleInfo" :model="roleInfo" :rules="rules" label-width="80px" class="demo-ruleForm">
         <el-form-item label="角色名称" prop="roleName" >
           <el-input v-model="roleInfo.roleName"></el-input>
@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { request } from '../../network/request'
+import { request } from '../../../network/request'
 export default {
   el: '',
   data () {

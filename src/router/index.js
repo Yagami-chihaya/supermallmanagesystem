@@ -28,12 +28,23 @@ const routes = [
       },
       {
         path:'/rights',
-        component:() =>import('../views/Home/childComponents/Rights.vue')
+        component:() =>import('../views/Home/childComponents/Power/Rights.vue')
       },
       {
         path:'/roles',
-        component:() =>import('../views/Home/childComponents/Roles.vue')
-      }
+        component:() =>import('../views/Home/childComponents/Power/Roles.vue')
+      },
+      {
+        path:'/goods',
+        component:() =>import('../views/Home/childComponents/Goods/Goods.vue')
+      },
+      {
+        path:'/params',
+        component:() =>import('../views/Home/childComponents/Goods/Params.vue')
+      },{
+        path:'/categories',
+        component:() =>import('../views/Home/childComponents/Goods/Category.vue')
+      },
     ],
     redirect:'/welcome'
   },

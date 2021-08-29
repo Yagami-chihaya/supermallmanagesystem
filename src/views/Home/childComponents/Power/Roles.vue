@@ -75,11 +75,11 @@
 </template>
 
 <script>
-import {request} from '../../../network/request'
-import editRightsBox from '../../../components/content/EditRightsBox.vue'
+import {request} from '../../../../network/request'
+import editRightsBox from '../../../../components/content/powerComponents/EditRightsBox.vue'
 
-import exitRolesBox from '../../../components/content/EditRolesBox.vue'
-import addRolesBox from '../../../components/content/AddRoles.vue'
+import exitRolesBox from '../../../../components/content/powerComponents/EditRolesBox.vue'
+import addRolesBox from '../../../../components/content/powerComponents/AddRoles.vue'
 
 
 export default {

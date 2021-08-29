@@ -46,11 +46,11 @@
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
-          :current-page="this.$store.state.queryInfo.pagenum"
+          :current-page="$store.state.queryInfo.pagenum"
           :page-sizes="[1, 2, 5, 10]"
-          :page-size="this.$store.state.queryInfo.pagesize"
+          :page-size="$store.state.queryInfo.pagesize"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="this.$store.state.total">
+          :total="$store.state.total">
         </el-pagination>
       </el-card>
 
@@ -63,9 +63,9 @@
 
 <script>
 import {request} from '../../../network/request'
-import addUserBox from '../../../components/content/addUserBox.vue'
-import setRolesBox from '../../../components/content/SetRolesBox.vue'
-import editUserBox from '../../../components/content/EditUserBox.vue'
+import addUserBox from '../../../components/content/powerComponents/addUserBox.vue'
+import setRolesBox from '../../../components/content/powerComponents/SetRolesBox.vue'
+import editUserBox from '../../../components/content/powerComponents/EditUserBox.vue'
 
 export default {
   el: '',
