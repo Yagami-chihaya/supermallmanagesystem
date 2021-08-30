@@ -8,7 +8,7 @@
     </el-breadcrumb>
 
     <el-card>
-      <el-button type="primary" class="addCartgory">添加分类</el-button>
+      <el-button type="primary" class="addCartgory" @click="openAddCartgoryBox">添加分类</el-button>
       <el-table
         :data="categoriesData"
         :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
@@ -59,6 +59,35 @@
         :total="total">
       </el-pagination>
     </el-card>
+
+    <el-dialog
+      title="提示"
+      v-model="isAddCategoryVisible"
+      width="50%"
+
+      @close="addCategoryClosed"
+      >
+      <el-form :model="addCategoriesForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="分类名称" prop="cat_name">
+          <el-input v-model="addCategoriesForm.cat_name"></el-input>
+        </el-form-item>
+        <el-form-item label="父类分级">
+          <el-cascader
+            clearable
+            
+            v-model="selectedKeys"
+            :options="parentCategory"
+            :props="cascaderProps"
+            @change="handleChange"></el-cascader>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="isAddCategoryVisible = false">取 消</el-button>
+          <el-button type="primary" @click="confirm">确 定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -78,7 +107,28 @@ export default {
       },
       
       categoriesData:[],
-      total:0
+      total:0,
+      isAddCategoryVisible:false,
+      rules:{
+        cat_name:[
+          {required:true,message:'请输入分级名称',trigger:'blur'}
+        ]
+      },
+      addCategoriesForm:{
+        cat_name:'',
+        cat_pid:0,
+        
+        cat_level:0,
+      },
+      parentCategory:[],
+      cascaderProps:{
+        value:'cat_id',
+        label:'cat_name',
+        children:'children',
+        expandTrigger:'hover',
+        checkStrictly:true
+      },
+      selectedKeys:[],
     }
   },
   methods: {
@@ -102,6 +152,52 @@ export default {
       this.queryInfo.pagenum = newPage
       this.getCategoriesData()
     },
+    openAddCartgoryBox(){
+      this.getParentCategory()
+      this.isAddCategoryVisible = true
+    },
+    confirm(){  
+      console.log(this.addCategoriesForm);
+      this.$refs.ruleForm.validate(valid=>{
+        if(!valid) return
+        request().post('categories',this.addCategoriesForm).then(res=>{
+          console.log(res);
+          if(res.data.meta.status!=201){
+            return this.$message.error(res.data.meta.msg)
+          }
+          this.getCategoriesData()
+          this.$message.success(res.data.meta.msg)
+          
+        })
+        this.isAddCategoryVisible = false
+      })
+      
+    },
+    getParentCategory(){
+      request().get('categories',{params:{type:2}}).then(res=>{
+        console.log(res);
+        if(res.data.meta.status!=200){
+          return this.$message.error(res.data.meta.msg)
+        }
+        this.parentCategory = res.data.data
+      })
+    },
+    handleChange(){
+      console.log(this.selectedKeys);
+      if(!this.selectedKeys){
+        this.addCategoriesForm.cat_level = 0
+        this.addCategoriesForm.cat_pid = 0
+      }else{
+      this.addCategoriesForm.cat_level = this.selectedKeys.length
+      this.addCategoriesForm.cat_pid = this.selectedKeys[this.selectedKeys.length-1]
+      }
+    },
+    addCategoryClosed(){
+      this.$refs.ruleForm.resetFields()
+      this.$selectedKeys = []
+      this.addCategoriesForm.cat_level = 0
+      this.addCategoriesForm.cat_pid = 0
+    }
   },
   created(){
     this.getCategoriesData()
