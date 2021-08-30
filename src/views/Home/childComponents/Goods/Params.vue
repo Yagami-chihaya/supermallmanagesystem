@@ -14,8 +14,22 @@
       <el-row class="cat_opt">
         <el-col>
           <span>选择商品分类：</span>
+          <el-cascader
+            v-model="selectedKeys"
+            :options="categoryList"
+            :props="cascaderProps"
+            @change="handleChange">
+          </el-cascader>
         </el-col>
       </el-row>
+      <el-tabs v-model="activeName" @tab-click="handleTagClick">
+        <el-tab-pane label="动态参数" name="first">
+          <el-button type="primary" size="mini" :disabled='isBtnVisible'>添加参数</el-button>
+        </el-tab-pane>
+        <el-tab-pane label="静态属性" name="second">
+          <el-button type="primary" size="mini" :disabled='isBtnVisible'>添加属性</el-button>
+        </el-tab-pane>
+      </el-tabs>
     </el-card>
   </div>
 </template>
@@ -27,19 +41,45 @@ export default {
   el: '',
   data () {
     return {
-      categoryList:[]
+      categoryList:[],
+      cascaderProps:{
+        value:'cat_id',
+        label:'cat_name',
+        children:'children',
+        expandTrigger:'hover',
+        
+      },
+      selectedKeys:[],
+      activeName:'first'
     }
   },
   methods: {
     getCategoryList(){
       request().get('categories').then(res=>{
+        console.log(res);
         if(res.data.meta.status!=200){
           return this.$message.error(res.data.meta.msg)
         }
         this.categoryList = res.data.data
       })
+    },
+    handleChange(){
+      console.log(this.selectedKeys);
+     
+    },
+  },
+  computed:{
+    isBtnVisible(){
+      if(this.selectedKeys.length!=3){
+        return true
+      }
+      return false 
     }
   },
+  created(){
+    this.getCategoryList()
+  }
+  
 }
 </script>
 

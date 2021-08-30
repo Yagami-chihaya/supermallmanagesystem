@@ -194,7 +194,7 @@ export default {
     },
     addCategoryClosed(){
       this.$refs.ruleForm.resetFields()
-      this.$selectedKeys = []
+      this.selectedKeys = []
       this.addCategoriesForm.cat_level = 0
       this.addCategoriesForm.cat_pid = 0
     }
