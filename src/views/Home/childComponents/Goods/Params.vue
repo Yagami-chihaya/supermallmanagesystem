@@ -23,17 +23,12 @@
         </el-col>
       </el-row>
       <el-tabs v-model="activeName" @tab-click="handleTagClick">
-<<<<<<< HEAD
-        <el-tab-pane label="动态参数" name="first">
-          <el-button type="primary" size="mini" :disabled='isBtnVisible'>添加参数</el-button>
-        </el-tab-pane>
-        <el-tab-pane label="静态属性" name="second">
-=======
+
         <el-tab-pane label="动态参数" name="many">
           <el-button type="primary" size="mini" :disabled='isBtnVisible'>添加参数</el-button>
         </el-tab-pane>
         <el-tab-pane label="静态属性" name="only">
->>>>>>> bee44e3... ''
+
           <el-button type="primary" size="mini" :disabled='isBtnVisible'>添加属性</el-button>
         </el-tab-pane>
       </el-tabs>
@@ -57,14 +52,11 @@ export default {
         
       },
       selectedKeys:[],
-<<<<<<< HEAD
-      activeName:'first'
-=======
       activeName:'many',
       cateId:0,
       manyTabData:[],
       onlyTabData:[],
->>>>>>> bee44e3... ''
+
     }
   },
   methods: {
@@ -79,10 +71,7 @@ export default {
     },
     handleChange(){
       console.log(this.selectedKeys);
-<<<<<<< HEAD
-     
-    },
-=======
+
       this.getParamsData()
     },
     handleTagClick(){
@@ -103,7 +92,7 @@ export default {
         }
       })
     }
->>>>>>> bee44e3... ''
+
   },
   computed:{
     isBtnVisible(){
@@ -111,15 +100,13 @@ export default {
         return true
       }
       return false 
-<<<<<<< HEAD
-=======
     },
     cateId(){
       if(this.selectedKeys.length==3){
         return this.selectedKeys[2]
       }
       else return null
->>>>>>> bee44e3... ''
+
     }
   },
   created(){
