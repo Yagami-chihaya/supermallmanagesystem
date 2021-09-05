@@ -33,22 +33,22 @@
                   v-for="(item,index) in scope.row.attr_vals"
                   :key="index"
                   closable
-                  @close="tagClose(index)"
+                  @close="tagClose(index,scope.row)"
                   >
                   {{item}}
                 </el-tag>
                 <el-input 
                   class="input-new-tag"
                   v-if="inputVisible"
-                  v-model="inputValue"
+                  v-model="scope.row.inputValue"
                   
                   ref="saveTagInput"
                   size="mini"
-                  @keyup.enter="handleInputConfirm"
-                  @blur="handleInputConfirm"
+                  @keyup.enter="handleInputConfirm(scope.row)"
+                  @blur="handleInputConfirm(scope.row)"
                 >
                 </el-input>
-                <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>  
+                <el-button v-else class="button-new-tag" size="small" @click="showInput(scope.row)">+ New Tag</el-button>  
               </template>
               
             </el-table-column>
@@ -70,24 +70,25 @@
             <el-table-column type="expand">
               <template v-slot:='scope'>  
                 <el-tag
-                  v-for="(item,index) in scope.row.vals_arrs"
+                  v-for="(item,index) in scope.row.attr_vals"
                   :key="index"
                   closable
-                  @close="tagClose(index)"
-                  >       
+                  @close="tagClose(index,scope.row)"
+                  >
+                  {{item}}       
                 </el-tag>    
                 <el-input 
                   class="input-new-tag"
                   v-if="inputVisible"
-                  v-model="inputValue"
+                  v-model="scope.row.inputValue"
                   ref="saveTagInput"
                   size="mini"
                   
-                  @keyup.enter="handleInputConfirm"
-                  @blur="handleInputConfirm"
+                  @keyup.enter="handleInputConfirm(scope.row)"
+                  @blur="handleInputConfirm(scope.row)"
                 >
               </el-input>
-              <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>        
+              <el-button v-else class="button-new-tag" size="small" @click="showInput(scope.row)">+ New Tag</el-button>        
               </template>
               
             </el-table-column>
@@ -110,7 +111,7 @@
       width="50%"
       @close="addDialogClosed"
       >
-      <el-form :model="addParamsData" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+      <el-form :model="addParamsData" :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
         <el-form-item :label="titleText" prop="attr_name">
           <el-input v-model="addParamsData.attr_name"></el-input>
         </el-form-item>
@@ -195,7 +196,11 @@ export default {
     },
     handleChange(){
       console.log(this.selectedKeys);
-
+      if(this.selectedKeys.length!==3){
+        this.selectedKeys = []
+        this.manyTabData = []
+        this.onlyTabData = []
+      }
       this.getParamsData()
     },
     handleTagClick(){
@@ -213,7 +218,8 @@ export default {
         res.data.data.forEach(item => {
           
           item.attr_vals = item.attr_vals? item.attr_vals.split(',') : []
-          
+          item.inputVisible = false
+          item.inputValue = ''
         });
         if(this.activeName == 'many'){
           this.manyTabData = res.data.data
@@ -268,21 +274,58 @@ export default {
       this.isEditParamsDialogVisible = false
     },
     deleteEditParam(attr){
-      request().delete(`categories/${this.cateId}/attributes/${attr.attr_id}`).then(res=>{
+      this.$confirm('此操作将永久删除该参数, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+          request().delete(`categories/${this.cateId}/attributes/${attr.attr_id}`).then(res=>{
+            if(res.data.meta.status!=200){
+              return this.$message.error(res.data.meta.msg)
+            }
+            this.getParamsData()
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });
+        });
+      
+      
+    },
+    tagClose(index,row){
+      row.attr_vals.splice(index,1)
+      request().put(`categories/${row.cat_id}/attributes/${row.attr_id}`,{attr_name:row.attr_name,attr_sel:row.attr_sel,attr_vals:row.attr_vals.join(',')}).then(res=>{
+        console.log(res);
         if(res.data.meta.status!=200){
-          return this.$message.error(res.data.meta.msg)
+          this.$message.error('删除参数属性失败')
         }
         this.getParamsData()
       })
     },
-    tagClose(index){
-      
-    },
-    handleInputConfirm(){
+    handleInputConfirm(row){
+      console.log(row);
+      row.attr_vals.push(row.inputValue)
 
+      request().put(`categories/${row.cat_id}/attributes/${row.attr_id}`,{attr_name:row.attr_name,attr_sel:row.attr_sel,attr_vals:row.attr_vals.join(',')}).then(res=>{
+        console.log(res);
+        if(res.data.meta.status!=200){
+          this.$message.error('添加参数属性失败')
+        }
+        this.getParamsData()
+      })
+      this.inputVisible = false
+      console.log('阿巴阿巴');
     },
-    showInput(){
+    showInput(row){
       this.inputVisible = true
+      console.log(row);
+      
     }
 
   },

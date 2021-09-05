@@ -44,7 +44,10 @@ const routes = [
       },{
         path:'/categories',
         component:() =>import('../views/Home/childComponents/Goods/Category.vue')
-      },
+      },{
+        path:'/goods/add',
+        component:() =>import('../views/Home/childComponents/Goods/Add.vue')
+      }
     ],
     redirect:'/welcome'
   },

@@ -135,13 +135,29 @@ export default {
       this.$store.state.isEditRolesBoxDialogVisible = true
     },
     deleteRole(id){
-      request().delete('roles/'+id).then(res=>{
-        if(res.data.meta.status!=200){
-          return this.$message.error(res.data.meta.msg)
-        }
-        this.$message.success(res.data.meta.msg)
-        this.getRolesList()
-      })
+      this.$confirm('此操作将永久删除该角色, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+          request().delete('roles/'+id).then(res=>{
+            if(res.data.meta.status!=200){
+              return this.$message.error(res.data.meta.msg)
+            }
+            this.$message.success(res.data.meta.msg)
+            this.getRolesList()
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });
+        });
+      
     }
   },
   created(){
