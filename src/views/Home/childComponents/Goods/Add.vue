@@ -114,6 +114,7 @@ export default {
         goods_cat:[],
         pics:[],
         goods_introduce:'',
+        attr:[],
       },
       rules:{
         goods_name:[
@@ -219,12 +220,41 @@ export default {
     addGoods(){                   
       console.log(this.addForm);
       this.$refs.ruleForm.validate(valid=>{
-        if(valid){
+        console.log(valid);
+        if(!valid){
           return this.$message.error('请正确填写相应信息')
         }
         const newAddForm = _.cloneDeep(this.addForm)      //深拷贝addForm用于把goods_cat从数组修改成字符串
         newAddForm.goods_cat = newAddForm.goods_cat.join(',')  //若直接修改addForm会导致其他请求goods_cat属性的方法报错
+        
+        this.manyTableData.forEach(item=>{
+          
+          const newInfo = {
+            attr_id:item.attr_id,
+            attr_vals:item.attr_vals.join(' ')
+          }
+          
+          this.addForm.attr.push(newInfo)
+        })
+        this.onlyTableData.forEach(item=>{
+          const newInfo = {
+            attr_id:item.attr_id,
+            attr_vals:item.attr_vals
+          }
+          this.addForm.attr.push(newInfo)
+        })
+        newAddForm.attr = this.addForm.attr
+       
         console.log(newAddForm);
+        request().post('goods',newAddForm).then(res=>{
+          console.log(res);
+          if(res.data.meta.status!=201){
+            this.$message.error(res.data.meta.msg)
+          }
+          this.getcategoriesList()
+          this.$message.success('成功添加商品')
+          this.$router.push('/goods')
+        })
       })
       
     }

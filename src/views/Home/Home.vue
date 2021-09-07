@@ -18,8 +18,7 @@
             :uniqueOpened="true"
             :default-active="activePage"
             class="el-menu-vertical-demo"
-            @open="handleOpen"
-            @close="handleClose"
+            
             background-color="#333744"
             text-color="#fff"
             active-text-color="#409BFF"

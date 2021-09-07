@@ -47,6 +47,12 @@ const routes = [
       },{
         path:'/goods/add',
         component:() =>import('../views/Home/childComponents/Goods/Add.vue')
+      },{
+        path:'/orders',
+        component:() =>import('../views/Home/childComponents/Order/Order.vue')
+      },{
+        path:'/reports',
+        component:() =>import('../views/Home/childComponents/Reports/Reports.vue')
       }
     ],
     redirect:'/welcome'
