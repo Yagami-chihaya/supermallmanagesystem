@@ -47,18 +47,59 @@
           </el-form-item>
           
         </el-tab-pane>
-        <el-tab-pane label="商品参数">商品参数</el-tab-pane>
-        <el-tab-pane label="商品属性">商品属性</el-tab-pane>
-        <el-tab-pane label="商品图片">商品图片</el-tab-pane>
-        <el-tab-pane label="商品内容">商品内容</el-tab-pane>
+        <el-tab-pane label="商品参数">
+          <el-form-item :label="item.attr_name" v-for="item in manyTableData" :key="item">
+            <el-checkbox-group v-model="item.attr_vals">
+              <el-checkbox :label="item2" v-for="item2 in item.attr_vals" :key="item2" border></el-checkbox>
+              
+            </el-checkbox-group>
+          </el-form-item>
+        </el-tab-pane>
+        <el-tab-pane label="商品属性">
+          <el-form-item :label="item.attr_name" v-for="item in onlyTableData" :key="item">
+            <el-input v-model="item.attr_vals"></el-input>
+          </el-form-item>
+        </el-tab-pane>
+        <el-tab-pane label="商品图片">
+          <el-upload
+  
+            :action="uploadUrl"
+            :on-preview="handlePreview"
+            :on-remove="handleRemove"
+            list-type="picture"
+            :headers="headerObj"
+            :on-success="handleSuccess"
+          >
+            <el-button size="small" type="primary">点击上传</el-button>
+            <template #tip>
+              <div class="el-upload__tip">只能上传 jpg/png 文件，且不超过 500kb</div>
+            </template>
+          </el-upload>
+        </el-tab-pane>
+        <el-tab-pane label="商品内容">
+          <QuillEditor v-model:content='addForm.goods_introduce' contentType='text'></QuillEditor>
+          <el-button type="primary" style="marginTop:15px" @click='addGoods'>添加商品</el-button>
+        </el-tab-pane>
+        
       </el-tabs>
       </el-form>
     </el-card>
+
+    <el-dialog
+      title="商品预览"
+      v-model="isPreviewDialogVisible"
+      width="50%"
+      
+    >
+      <img :src="preUrl" style="width:100%">
+     
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import {request} from '../../../../network/request'
+import _ from 'lodash'
 
 export default {
   el: '',
@@ -71,6 +112,8 @@ export default {
         goods_number:0,
         goods_weight:0,
         goods_cat:[],
+        pics:[],
+        goods_introduce:'',
       },
       rules:{
         goods_name:[
@@ -96,7 +139,14 @@ export default {
         value:'cat_id',
         children:'children'
       },
-      manyTableData:[]
+      manyTableData:[],
+      onlyTableData:[],
+      uploadUrl:'https://lianghj.top:8888/api/private/v1/upload',
+      headerObj:{
+        Authorization:window.sessionStorage.getItem('token')
+      },
+      preUrl:'',
+      isPreviewDialogVisible:false,
     }
   },
   methods: {
@@ -128,12 +178,58 @@ export default {
           if(res.data.meta.status!=200){
             return this.$message.error('获取参数失败')
           }
+          res.data.data.forEach(item=>{
+            item.attr_vals = item.attr_vals.length===0?[]:item.attr_vals.split(',')
+            console.log(item);
+          })
+          
           this.manyTableData = res.data.data
           console.log(this.manyTableData);
         })
+      }else if(this.activeIndex == 2){
+        request().get(`categories/${this.addForm.goods_cat[2]}/attributes`,{params:{sel:'only'}}).then(res=>{
+          console.log(res);
+          if(res.data.meta.status!=200){
+            return this.$message.error('获取静态属性失败')
+          }
+          this.onlyTableData = res.data.data
+        })
       }
+    },
+    handlePreview(res){
+      console.log(res);
+      this.preUrl = res.url
+      this.isPreviewDialogVisible = true
+    },
+    handleRemove(file){
+      console.log(file);
+      const filePath = file.response.data.tmp_path
+      const i = this.addForm.pics.findIndex(x=>x.pic == filePath)
+      this.addForm.pics.splice(i,1)
+      console.log(this.addForm.pics);
+    },
+    handleSuccess(res){
+      console.log(res);
+      const imgInfo = {
+        pic:res.data.tmp_path
+      }
+      this.addForm.pics.push(imgInfo)
+      console.log(this.addForm.pics);
+    },
+    addGoods(){                   
+      console.log(this.addForm);
+      this.$refs.ruleForm.validate(valid=>{
+        if(valid){
+          return this.$message.error('请正确填写相应信息')
+        }
+        const newAddForm = _.cloneDeep(this.addForm)      //深拷贝addForm用于把goods_cat从数组修改成字符串
+        newAddForm.goods_cat = newAddForm.goods_cat.join(',')  //若直接修改addForm会导致其他请求goods_cat属性的方法报错
+        console.log(newAddForm);
+      })
+      
     }
   },
+ 
   created(){
     this.getcategoriesList()
   }
@@ -145,4 +241,5 @@ export default {
     margin: 15px auto;
    
   }
+  
 </style>

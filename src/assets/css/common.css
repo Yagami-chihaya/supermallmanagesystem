@@ -7,3 +7,7 @@ html,body,#nav{
 .el-breadcrumb{
   padding-bottom: 15px;
 }
+
+.ql-editor{
+  height: 300px !important;
+}
