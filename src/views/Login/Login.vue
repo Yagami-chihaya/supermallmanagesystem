@@ -2,7 +2,7 @@
   <div class="login">
     <div class="loginBox">
       <div class="avatarBox">
-        <img src="../../assets/logo.png">
+        <img src="../../assets/img/给心心.png">
       </div>
       
       

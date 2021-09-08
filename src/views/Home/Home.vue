@@ -5,7 +5,7 @@
       
       <el-header>
         <div class="left">
-          <img src="../../assets/img/电商.png">
+          <img src="../../assets/img/商场.png">
           <span>电商后台管理系统</span>
         </div>
         <el-button type="primary" @click='exit'>退出</el-button>
